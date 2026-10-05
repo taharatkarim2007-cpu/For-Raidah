@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catch the Food 💿</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  font-family: Arial, sans-serif;
+  color: #3b1557;
+
+  background:
+    radial-gradient(circle at 15% 20%, white 0 3px, transparent 4px),
+    radial-gradient(circle at 80% 30%, white 0 3px, transparent 4px),
+    linear-gradient(135deg, #ff9bd8, #a98cff, #6ee7ff);
+}
+
+.card {
+  width: min(430px, 100%);
+  padding: 16px;
+
+  background: rgba(255,255,255,0.8);
+  border: 4px solid white;
+  border-radius: 26px;
+
+  box-shadow: 8px 8px 0 #54206f;
+}
+
+h1 {
+  text-align: center;
+  margin: 0;
+  font-size: 29px;
+  text-shadow: 2px 2px white;
+}
+
+.sub {
+  text-align: center;
+  font-weight: bold;
+  margin: 5px;
+}
+
+.score {
+  text-align: center;
+  font-weight: 900;
+  margin: 10px;
+}
+
+/* GAME AREA */
+#game {
+  height: 500px;
+  position: relative;
+  overflow: hidden;
+
+  border: 4px solid #54206f;
+  border-radius: 20px;
+
+  background: linear-gradient(#c9f5ff, #ffd2ed);
+}
+
+#game::before {
+  content: "✦ Y2K FOOD RUSH ✦";
+
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
+
+  text-align: center;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+/* FOOD */
+.food {
+  position: absolute;
+  top: -60px;
+
+  border: none;
+  background: transparent;
+
+  font-size: 42px;
+  padding: 8px;
+
+  cursor: pointer;
+  touch-action: manipulation;
+
+  filter: drop-shadow(3px 3px white);
+
+  animation: fall 3s linear forwards;
+}
+
+@keyframes fall {
+  from {
+    transform: translateY(-60px) rotate(0deg);
+  }
+
+  to {
+    transform: translateY(570px) rotate(360deg);
+  }
+}
+
+/* FINAL MESSAGE */
+#message {
+  display: none;
+  text-align: center;
+  padding: 60px 10px;
+
+  font-weight: 900;
+}
+
+.big {
+  font-size: 36px;
+  color: #ff32a8;
+
+  text-shadow: 2px 2px white;
+}
+
+#start {
+  display: block;
+
+  margin: 12px auto 2px;
+  padding: 12px 20px;
+
+  border: 3px solid #35104f;
+  border-radius: 14px;
+
+  background: #ff6fc7;
+  color: white;
+
+  font-weight: 900;
+  font-size: 15px;
+
+  box-shadow: 4px 4px #35104f;
+  cursor: pointer;
+}
+</style>
+</head>
+
+
+<body>
+
+<div class="card">
+
+  <h1>💿 CATCH THE FOOD 💿</h1>
+
+  <div class="sub">
+    ✦ Y2K FOOD RUSH ✦
+  </div>
+
+  <div class="score" id="score">
+    CAUGHT: 0 / 10
+  </div>
+
+
+  <!-- GAME -->
+  <div id="game"></div>
+
+
+  <!-- FINAL MESSAGE -->
+  <div id="message">
+
+    <div class="big">
+      🎉 HAPPY BIRTHDAY CUTIE 🎉
+    </div>
+
+    <p>
+      💖 YOU CAUGHT THEM ALL! 💖
+    </p>
+
+    <p>
+      Hope your day is as iconic as you are ✨💅
+    </p>
+
+    <p>
+      🍓🍟🍩🍕🧁🍒
+    </p>
+
+  </div>
+
+
+  <button id="start">
+    START THE FOOD RUSH ✨
+  </button>
+
+</div>
+
+
+<script>
+
+const game = document.getElementById("game");
+const score = document.getElementById("score");
+const message = document.getElementById("message");
+const start = document.getElementById("start");
+
+const foods = [
+  "🍓",
+  "🍕",
+  "🍩",
+  "🍟",
+  "🍔",
+  "🧁",
+  "🍒",
+  "🍪",
+  "🍉",
+  "🍭"
+];
+
+let caught = 0;
+let timer;
+
+
+/* CREATE FOOD */
+function spawnFood() {
+
+  if (caught >= 10) return;
+
+  const food = document.createElement("button");
+
+  food.className = "food";
+
+  food.textContent =
+    foods[Math.floor(Math.random() * foods.length)];
+
+  food.style.left =
+    (Math.random() * 82 + 3) + "%";
+
+  game.appendChild(food);
+
+
+  /* CATCH FOOD */
+  food.addEventListener("click", function () {
+
+    if (food.dataset.caught) return;
+
+    food.dataset.caught = "true";
+
+    caught++;
+
+    score.textContent =
+      "CAUGHT: " + caught + " / 10";
+
+    food.remove();
+
+
+    /* WIN */
+    if (caught === 10) {
+
+      clearInterval(timer);
+
+      game.style.display = "none";
+
+      message.style.display = "block";
+
+      start.style.display = "none";
+    }
+
+  });
+
+
+  /* REMOVE IF MISSED */
+  setTimeout(function () {
+
+    if (food.isConnected) {
+      food.remove();
+    }
+
+  }, 3000);
+}
+
+
+/* START GAME */
+start.addEventListener("click", function () {
+
+  caught = 0;
+
+  score.textContent = "CAUGHT: 0 / 10";
+
+  game.style.display = "block";
+
+  message.style.display = "none";
+
+  start.style.display = "none";
+
+  clearInterval(timer);
+
+  spawnFood();
+
+  timer = setInterval(spawnFood, 850);
+
+});
+
+</script>
+
+</body>
+</html>
